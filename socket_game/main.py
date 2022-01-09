@@ -2,41 +2,43 @@ import socket
 import threading
 
 class Client_connection:
-    def __init__(self, ip:str, port:int, header:list = [], format:list = []):
+    def __init__(self, ip:str, port:int, header:list, format:list):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.header = header
         self.format = format
-        self.sock.settimeout(0)
+        #self.sock.settimeout(0)
         self.ip = ip
         self.port = port
+    
+    def disconnect(self):
+        self.sock.close()
+    
     def connect(self):
         self.sock.connect((self.ip, self.port))
 
 class Server_connection(threading.Thread):
-    def __init__(self, port: int, header: list = [], format: list = []):
+    def __init__(self, port: int, header: list, format: list):
         threading.Thread.__init__(self)
         self.header = header
         self.format = format
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind(("0.0.0.0", port))
+        self.server.bind(("localhost", port))
     def run(self):
         self.go = True
         self.all_thread = []
         while self.go:
             self.server.listen(1)
-            try:
-                clientsock, clientAddress = self.server.accept()
-                newthread = ClientThread(clientAddress, clientsock)
-                newthread.start()
-                self.all_thread.append(newthread)
-            except:
-                pass
+            clientsock, clientAddress = self.server.accept()
+            clientsock.setblocking(1)
+            newthread = ClientThread(clientAddress, clientsock)
+            newthread.start()
+            self.all_thread.append(newthread)
     def stop(self):
         self.go = False
-        self.server.close()
         for i in self.all_thread:
             i.csocket.close()
+        self.server.close()
 
 class ClientThread(threading.Thread):
     def __init__(self, clientAddress, clientsocket):

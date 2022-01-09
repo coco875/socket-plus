@@ -6,5 +6,6 @@ c = socket_game.Client_connection("localhost", 8000)
 input()
 c.connect()
 input()
+c.disconnect()
 s.stop()
 
