@@ -36,11 +36,14 @@ def update(self):
     #     self.csocket.send(bytes(msg, 'UTF-8'))
     # print("Client at ", self.client_adress, " disconnected...")
 
-s = socket_game.Server_connection("localhost", 8000, headers_socket, format_socket, update=update)
+s = socket_game.Server_connection("localhost", 6000, headers_socket, format_socket, update=update)
 s.start()
 c = socket_game.Client_connection(
-    "54.90.102.21", 6000,  headers_socket, format_socket)
-c.connect()
+    "localhost", 6000,  headers_socket, format_socket)
+try:
+    c.connect()
+except TimeoutError:
+    s.stop()
 input()
 #print(c.recv())
 input()

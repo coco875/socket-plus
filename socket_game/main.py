@@ -33,11 +33,17 @@ class Server_connection(threading.Thread):
     def run(self):
         while self.starting:
             self.server.listen(1)
-            clientsock, client_adress = self.server.accept()
-            clientsock.setblocking(1)
-            newthread = ClientThread(client_adress, clientsock, self.update, self.header, self.format)
-            newthread.start()
-            self.all_thread.append(newthread)
+            try:
+                clientsock, client_adress = self.server.accept()
+            except OSError:
+                pass
+            except Exception as err:
+                print(err)
+            else:
+                clientsock.setblocking(1)
+                newthread = ClientThread(client_adress, clientsock, self.update, self.header, self.format)
+                newthread.start()
+                self.all_thread.append(newthread)
     def stop(self):
         """stop server"""
         self.starting = False
@@ -61,6 +67,7 @@ class ClientThread(threading.Thread):
         print("Connection from : ", self.client_adress)
         #self.csocket.send(bytes("Hi, This is from Server..",'utf-8'))
         self.update(self)
+
     def add_to_send(self, thing:dict):
         for i in self.header:
             self.list_bit += convert_to_bin(thing, i)
@@ -68,6 +75,9 @@ class ClientThread(threading.Thread):
         for i in self.format[last]:
             self.list_bit += convert_to_bin(thing, i)
         print(self.list_bit)
+    
+    def send(self):
+        divided_list(self.list_bit,8)
 
 def convert_to_bin(values:dict, struc:dict) -> list:
     types = struc["type"]
@@ -97,3 +107,13 @@ def convert_to_bin(values:dict, struc:dict) -> list:
         for i in ans:
             rep.append(int(i))
         return rep
+
+def divided_list(liste:list, num:int):
+    list_div = []
+    tmp = []
+    for i in liste:
+        tmp.append(i)
+        if len(tmp) == num:
+            list_div.append(tmp)
+            tmp = []
+    
