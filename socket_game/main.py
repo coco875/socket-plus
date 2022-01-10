@@ -62,4 +62,4 @@ class ClientThread(threading.Thread):
                 break
             print("from client", msg)
             self.csocket.send(bytes(msg, 'UTF-8'))
-        print("Client at ", client_adress, " disconnected...")
+        print("Client at ", self.client_adress, " disconnected...")
