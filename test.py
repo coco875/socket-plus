@@ -23,10 +23,26 @@ format_socket = {
     ]
 }
 
-s = socket_game.Server_connection("localhost", 8000, headers_socket, format_socket)
+def update(self):
+    self.add_to_send({"id_type": 0, "len_msg": 4, "msg": "ABC"})
+    self.send()
+    # msg = ''
+    # while True:
+    #     data = self.csocket.recv(2048)
+    #     msg = data.decode()
+    #     if msg == 'bye':
+    #         break
+    #     print("from client", msg)
+    #     self.csocket.send(bytes(msg, 'UTF-8'))
+    # print("Client at ", self.client_adress, " disconnected...")
+
+s = socket_game.Server_connection("localhost", 8000, headers_socket, format_socket, update=update)
 s.start()
-c = socket_game.Client_connection("localhost", 8000,  headers_socket, format_socket)
+c = socket_game.Client_connection(
+    "54.90.102.21", 6000,  headers_socket, format_socket)
 c.connect()
+input()
+#print(c.recv())
 input()
 c.disconnect()
 s.stop()
