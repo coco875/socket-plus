@@ -17,6 +17,18 @@ class Client_connection:
     def connect(self):
         """connect client from server"""
         self.sock.connect((self.adresse_ip, self.port))
+    def recv(self):
+        msg = self.sock.recv(1024)
+        bin_msg = convert_bit(msg)
+        data = {}
+        while len(bin_msg)>0:
+            for i in self.header:
+                d, bin_msg = convert_bytes(data, bin_msg, i)
+                data.update(d)
+            for i in self.format[data[list(data)[-1]]]:
+                d, bin_msg = convert_bytes(data, bin_msg, i)
+                data.update(d)
+        print(data)
 
 class Server_connection(threading.Thread):
     def __init__(self, adresse_ip: str, port: int, header: list, format_socket: list, update):
@@ -74,10 +86,14 @@ class ClientThread(threading.Thread):
             last = thing[i["name"]]
         for i in self.format[last]:
             self.list_bit += convert_to_bin(thing, i)
-        print(self.list_bit)
     
     def send(self):
-        divided_list(self.list_bit,8)
+        bit_byte = divided_list(self.list_bit,8)
+        send = b""
+        for i in bit_byte:
+            send += convert_bit_byte(i)
+        self.csocket.send(send)
+        print(send)
 
 def convert_to_bin(values:dict, struc:dict) -> list:
     types = struc["type"]
@@ -85,7 +101,6 @@ def convert_to_bin(values:dict, struc:dict) -> list:
     value = values[struc["name"]]
     if type(lenght) is str:
         lenght = values[lenght]
-    print(lenght)
     ans = types(value)
     t = ""
     if types == int:
@@ -98,14 +113,17 @@ def convert_to_bin(values:dict, struc:dict) -> list:
         rep.reverse()
         return rep
     if types == str:
+        ans += " "*(lenght-len(ans))
         ans = bytes(ans, 'utf-8')
         ans = int.from_bytes(ans, "big")
         ans = bin(ans)[2:]
-        t += "0"*(lenght-len(ans))
-        ans = t+ans
+        t += "0"*((lenght*8)-len(ans))
+        ans = ans
+        print(ans)
         rep = []
         for i in ans:
             rep.append(int(i))
+        rep.reverse()
         return rep
 
 def divided_list(liste:list, num:int):
@@ -116,4 +134,47 @@ def divided_list(liste:list, num:int):
         if len(tmp) == num:
             list_div.append(tmp)
             tmp = []
-    
+    list_div.append(tmp)
+    return list_div
+
+def convert_bit_byte(bit:list):
+    #bit.reverse()
+    num = 0
+    pow_2 = 1
+    for i in bit:
+        num += pow_2*i
+        pow_2 *= 2
+    return int(num).to_bytes(1, "big")
+
+def convert_bit(byt:bytes):
+    bit = []
+    for i in byt:
+        num_bit = bin(i)[2:]
+        num_bit = "0"*(8-len(num_bit)) + num_bit
+        num_bit = num_bit[::-1]
+        for j in num_bit:
+            bit.append(int(j))
+    return bit
+
+def convert_bytes(data:dict, bins:list, struct:dict) -> (dict,list):
+    lenght = struct["len"]
+    if type(lenght) is str:
+        lenght = data[lenght]
+    traited_bin = bins[:lenght]
+    if struct["type"]==int:
+        tmp_num = 1
+        num = 0
+        for i in traited_bin:
+            num += tmp_num*i
+            tmp_num *= 2
+        return {struct["name"]:num}, bins[lenght:]
+    if struct["type"]==str:
+        lenght *= 8
+        traited_bin = bins[:lenght]
+        tmp_num = 1
+        num = 0
+        for i in traited_bin:
+            num += tmp_num*i
+            tmp_num *= 2
+        chn = int.to_bytes(num, int(lenght/8), "big")
+        return {struct["name"]: chn.decode('utf-8')}, bins[lenght:]

@@ -24,7 +24,7 @@ format_socket = {
 }
 
 def update(self):
-    self.add_to_send({"id_type": 0, "len_msg": 4, "msg": "ABC"})
+    self.add_to_send({"id_type": 0, "len_msg": 4, "msg": " oi"})
     self.send()
     # msg = ''
     # while True:
@@ -45,7 +45,7 @@ try:
 except TimeoutError:
     s.stop()
 input()
-#print(c.recv())
+c.recv()
 input()
 c.disconnect()
 s.stop()
