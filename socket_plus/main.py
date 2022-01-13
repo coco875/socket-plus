@@ -3,11 +3,22 @@ import threading
 from typing import List, Tuple
 
 class Client_connection:
-    def __init__(self, adresse_ip:str, port:int, header:list, format_socket:list):
+    def __init__(self, adresse_ip:str, port:int, client_header:List[dict], client_format:List[dict], server_header:List[dict] = List[dict], server_format:List[dict] = List[dict]):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.header = header
-        self.format = format_socket
-        #self.sock.settimeout(0)
+        if server_header is not List[dict]:
+            self.s_header = server_header
+        else:
+            self.s_header = client_header
+        
+        if server_format is not List[dict]:
+            self.s_format = server_format
+        else:
+            self.s_format = client_format
+
+        self.c_header = client_header
+        self.c_format = client_format
+        self.s_header = server_header
+        self.s_format = server_format
         self.adresse_ip = adresse_ip
         self.port = port
         self.list_bit = []
@@ -49,7 +60,7 @@ class Client_connection:
         print(data)
 
 class Server_connection(threading.Thread):
-    def __init__(self, adresse_ip: str, port: int, header: list, format_socket: list, update):
+    def __init__(self, adresse_ip: str, port: int, header: List[dict], format_socket: List[dict], update: function):
         threading.Thread.__init__(self)
         self.header = header
         self.format = format_socket
@@ -74,7 +85,7 @@ class Server_connection(threading.Thread):
                 newthread = ClientThread(client_adress, clientsock, self.update, self.header, self.format)
                 newthread.start()
                 self.all_thread.append(newthread)
-    def stop(self):
+    def stop(self) -> None:
         """stop server"""
         self.starting = False
         for i in self.all_thread:
@@ -95,17 +106,16 @@ class ClientThread(threading.Thread):
 
     def run(self):
         print("Connection from : ", self.client_adress)
-        #self.csocket.send(bytes("Hi, This is from Server..",'utf-8'))
         self.update(self)
 
-    def add_to_send(self, thing:dict):
+    def add_to_send(self, thing:dict) -> None:
         for i in self.header:
             self.list_bit += convert_to_bin(thing, i)
             last = thing[i["name"]]
         for i in self.format[last]:
             self.list_bit += convert_to_bin(thing, i)
     
-    def send(self):
+    def send(self) -> None:
         bit_byte = divided_list(self.list_bit,8)
         send = b""
         for i in bit_byte:
@@ -113,18 +123,20 @@ class ClientThread(threading.Thread):
         self.csocket.send(send)
         print(send)
     
-    def recv(self):
+    def recv(self) -> List[dict]:
         msg = self.csocket.recv(1024)
         bin_msg = convert_bit(msg)
-        data = {}
+        all_data = []
         while len(bin_msg) > 0:
+            data = {}
             for i in self.header:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
                 data.update(d)
             for i in self.format[data[list(data)[-1]]]:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
                 data.update(d)
-        print(data)
+            all_data.append(data)
+        return all_data
 
 def convert_to_bin(values:dict, struc:dict) -> List[list]:
     types = struc["type"]
