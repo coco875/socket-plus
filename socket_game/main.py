@@ -9,6 +9,7 @@ class Client_connection:
         #self.sock.settimeout(0)
         self.adresse_ip = adresse_ip
         self.port = port
+        self.list_bit = []
 
     def disconnect(self):
         """disconnect client from server"""
@@ -17,6 +18,22 @@ class Client_connection:
     def connect(self):
         """connect client from server"""
         self.sock.connect((self.adresse_ip, self.port))
+    
+    def add_to_send(self, thing: dict):
+        for i in self.header:
+            self.list_bit += convert_to_bin(thing, i)
+            last = thing[i["name"]]
+        for i in self.format[last]:
+            self.list_bit += convert_to_bin(thing, i)
+
+    def send(self):
+        bit_byte = divided_list(self.list_bit, 8)
+        send = b""
+        for i in bit_byte:
+            send += convert_bit_byte(i)
+        self.sock.send(send)
+        print(send)
+
     def recv(self):
         msg = self.sock.recv(1024)
         bin_msg = convert_bit(msg)
@@ -94,6 +111,19 @@ class ClientThread(threading.Thread):
             send += convert_bit_byte(i)
         self.csocket.send(send)
         print(send)
+    
+    def recv(self):
+        msg = self.csocket.recv(1024)
+        bin_msg = convert_bit(msg)
+        data = {}
+        while len(bin_msg) > 0:
+            for i in self.header:
+                d, bin_msg = convert_bytes(data, bin_msg, i)
+                data.update(d)
+            for i in self.format[data[list(data)[-1]]]:
+                d, bin_msg = convert_bytes(data, bin_msg, i)
+                data.update(d)
+        print(data)
 
 def convert_to_bin(values:dict, struc:dict) -> list:
     types = struc["type"]
