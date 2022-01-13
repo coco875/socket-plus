@@ -26,17 +26,12 @@ format_socket = {
 def update(self):
     msg = "test message"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
+    msg = "c'est un test"
+    self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
+    msg = "alors ça marche plusieur"
+    self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     self.send()
     print(self.recv())
-    # msg = ''
-    # while True:
-    #     data = self.csocket.recv(2048)
-    #     msg = data.decode()
-    #     if msg == 'bye':
-    #         break
-    #     print("from client", msg)
-    #     self.csocket.send(bytes(msg, 'UTF-8'))
-    # print("Client at ", self.client_adress, " disconnected...")
     
 s = socket_plus.Server_connection("localhost", 6000, headers_socket, format_socket, update=update)
 s.start()
