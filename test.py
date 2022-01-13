@@ -36,7 +36,7 @@ def update(self):
     #     print("from client", msg)
     #     self.csocket.send(bytes(msg, 'UTF-8'))
     # print("Client at ", self.client_adress, " disconnected...")
-
+    
 s = socket_plus.Server_connection("localhost", 6000, headers_socket, format_socket, update=update)
 s.start()
 c = socket_plus.Client_connection(
