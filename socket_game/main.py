@@ -1,5 +1,6 @@
 import socket
 import threading
+from typing import List, Tuple
 
 class Client_connection:
     def __init__(self, adresse_ip:str, port:int, header:list, format_socket:list):
@@ -125,7 +126,7 @@ class ClientThread(threading.Thread):
                 data.update(d)
         print(data)
 
-def convert_to_bin(values:dict, struc:dict) -> list:
+def convert_to_bin(values:dict, struc:dict) -> List[list]:
     types = struc["type"]
     lenght = struc["len"]
     value = values[struc["name"]]
@@ -156,7 +157,7 @@ def convert_to_bin(values:dict, struc:dict) -> list:
         rep.reverse()
         return rep
 
-def divided_list(liste:list, num:int):
+def divided_list(liste:list, num:int) -> List[list]:
     list_div = []
     tmp = []
     for i in liste:
@@ -167,7 +168,7 @@ def divided_list(liste:list, num:int):
     list_div.append(tmp)
     return list_div
 
-def convert_bit_byte(bit:list):
+def convert_bit_byte(bit:list) -> bytes:
     #bit.reverse()
     num = 0
     pow_2 = 1
@@ -176,7 +177,7 @@ def convert_bit_byte(bit:list):
         pow_2 *= 2
     return int(num).to_bytes(1, "big")
 
-def convert_bit(byt:bytes):
+def convert_bit(byt:bytes) -> List[int]:
     bit = []
     for i in byt:
         num_bit = bin(i)[2:]
@@ -186,7 +187,7 @@ def convert_bit(byt:bytes):
             bit.append(int(j))
     return bit
 
-def convert_bytes(data:dict, bins:list, struct:dict) -> (dict,list):
+def convert_bytes(data:dict, bins:list, struct:dict) -> Tuple[dict,list]:
     lenght = struct["len"]
     if type(lenght) is str:
         lenght = data[lenght]
