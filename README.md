@@ -1,2 +1,4 @@
 # socket-plus
- a librairie in python to comunicate more efficiently possible designed for game
+A librairie in python to comunicate more efficiently possible.  
+
+to use put socket_plus in the same directory of your project
