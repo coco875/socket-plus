@@ -28,7 +28,7 @@ def update(self):
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     msg = "c'est un test"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
-    msg = "alors ça marche plusieur"
+    msg = "alors ça plu"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     self.send()
     print(self.recv())
@@ -41,6 +41,7 @@ try:
     c.connect()
 except TimeoutError:
     s.stop()
+input()
 print(c.recv())
 c.add_to_send({"id_type": 0, "len_msg": 4, "msg": " oi"})
 c.send()

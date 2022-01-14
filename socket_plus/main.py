@@ -103,6 +103,11 @@ class Client_connection:
         bin_msg = convert_bit(msg)
         all_data = []
         while len(bin_msg) > 0:
+            bit_byte = divided_list(bin_msg, 8)
+            send = b""
+            for i in bit_byte:
+                send += convert_bit_byte(i)
+            print(send)
             data = {}
             for i in self.s_header:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
@@ -224,8 +229,9 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
         ans = bytes(ans, 'utf-8')
         ans = int.from_bytes(ans, "big")
         ans = bin(ans)[2:]
-        t += "0"*((lenght*8)-len(ans))
-        ans = ans
+        t += "0"*(((lenght)*8)-len(ans))
+        print(len(t))
+        ans = t+ans
         rep = []
         for i in ans:
             rep.append(int(i))
