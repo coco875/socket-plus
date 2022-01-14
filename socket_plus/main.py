@@ -107,7 +107,8 @@ class Client_connection:
             send = b""
             for i in bit_byte:
                 send += convert_bit_byte(i)
-            print(send)
+            print()
+            print(bit_byte, all_data)
             data = {}
             for i in self.s_header:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
@@ -190,7 +191,6 @@ class ClientThread(threading.Thread):
         for i in bit_byte:
             send += convert_bit_byte(i)
         self.csocket.send(send)
-        print(send)
     
     def recv(self) -> list[dict]:
         msg = self.csocket.recv(1024)
@@ -230,7 +230,6 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
         ans = int.from_bytes(ans, "big")
         ans = bin(ans)[2:]
         t += "0"*(((lenght)*8)-len(ans))
-        print(len(t))
         ans = t+ans
         rep = []
         for i in ans:

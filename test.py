@@ -29,7 +29,7 @@ def update(self):
     msg = "c'est un test"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     msg = "alors ça plu"
-    self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
+    self.add_to_send({"id_type": 0, "len_msg": len(msg)+1, "msg": msg})
     self.send()
     print(self.recv())
     
@@ -42,7 +42,14 @@ try:
 except TimeoutError:
     s.stop()
 input()
-print(c.recv())
+try:
+    print(c.recv())
+except Exception as err: 
+    print(type(err))    # the exception instance
+    print(err.args)     # arguments stored in .args
+    print(err)
+    input()
+    s.stop()
 c.add_to_send({"id_type": 0, "len_msg": 4, "msg": " oi"})
 c.send()
 c.disconnect()
