@@ -13,7 +13,7 @@ format_socket = {
         {
             "name":"len_msg",
             "type":int,
-            "len":4
+            "len":12
         },
         {
             "name":"msg",
@@ -28,8 +28,9 @@ def update(self):
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     msg = "c'est un test"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
-    msg = "alors ça plu"
-    self.add_to_send({"id_type": 0, "len_msg": len(msg)+1, "msg": msg})
+    msg = "bon ça marche iqimjdijqmoiejrfm"
+    print(bytes(msg,'utf-8'), len(bytes(msg,'utf-8')))
+    self.add_to_send({"id_type": 0, "len_msg": 100, "msg": msg})
     self.send()
     print(self.recv())
     

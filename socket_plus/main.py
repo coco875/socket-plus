@@ -222,12 +222,17 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
     if types == str:
         ans = bytes(ans, 'utf-8')
         ans += b" "*(lenght-len(ans))
-        ans = int.from_bytes(ans, "big")
-        ans = bin(ans)[2:]
-        t += "0"*(((lenght)*8)-len(ans))
-        ans = t+ans
-        rep = []
+        str_bin = ""
         for i in ans:
+            h = bin(i)[2:]
+            h = "0"*(8-len(h))+h
+            str_bin = str_bin+h
+        # ans = int.from_bytes(ans, "big")
+        # ans = bin(ans)[2:]
+        # t += "0"*(((lenght)*8)-len(ans))
+        # ans = t+ans
+        rep = []
+        for i in str_bin:
             rep.append(int(i))
         rep.reverse()
         return rep
