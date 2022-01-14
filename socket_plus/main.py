@@ -13,7 +13,8 @@ def divided_list(liste:list, num:int) -> list[list]:
         if len(tmp) == num:
             list_div.append(tmp)
             tmp = []
-    list_div.append(tmp)
+    if len(tmp) != 0:
+        list_div.append(tmp)
     return list_div
 
 def convert_bit_byte(bit:list) -> bytes:
@@ -100,15 +101,12 @@ class Client_connection:
 
     def recv(self):
         msg = self.sock.recv(1024)
+        print(msg)
         bin_msg = convert_bit(msg)
         all_data = []
         while len(bin_msg) > 0:
-            bit_byte = divided_list(bin_msg, 8)
-            send = b""
-            for i in bit_byte:
-                send += convert_bit_byte(i)
             print()
-            print(bit_byte, all_data)
+            print(bin_msg, all_data)
             data = {}
             for i in self.s_header:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
@@ -191,6 +189,7 @@ class ClientThread(threading.Thread):
         for i in bit_byte:
             send += convert_bit_byte(i)
         self.csocket.send(send)
+        print(send)
     
     def recv(self) -> list[dict]:
         msg = self.csocket.recv(1024)
@@ -225,8 +224,8 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
         rep.reverse()
         return rep
     if types == str:
-        ans += " "*(lenght-len(ans))
         ans = bytes(ans, 'utf-8')
+        ans += b" "*(lenght-len(ans))
         ans = int.from_bytes(ans, "big")
         ans = bin(ans)[2:]
         t += "0"*(((lenght)*8)-len(ans))
