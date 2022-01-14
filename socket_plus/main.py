@@ -101,12 +101,9 @@ class Client_connection:
 
     def recv(self):
         msg = self.sock.recv(1024)
-        print(msg)
         bin_msg = convert_bit(msg)
         all_data = []
         while len(bin_msg) > 0:
-            print()
-            print(bin_msg, all_data)
             data = {}
             for i in self.s_header:
                 d, bin_msg = convert_bytes(data, bin_msg, i)
@@ -189,7 +186,6 @@ class ClientThread(threading.Thread):
         for i in bit_byte:
             send += convert_bit_byte(i)
         self.csocket.send(send)
-        print(send)
     
     def recv(self) -> list[dict]:
         msg = self.csocket.recv(1024)
