@@ -145,7 +145,7 @@ class Server_connection(threading.Thread):
                 pass
             else:
                 clientsock.setblocking(1)
-                newthread = ClientThread(client_adress, clientsock, self.s_header, self.s_format, self.c_header, self.c_format, self.update)
+                newthread = Client_Thread(client_adress, clientsock, self.s_header, self.s_format, self.c_header, self.c_format, self.update)
                 newthread.start()
                 self.all_thread.append(newthread)
     def stop(self) -> None:
@@ -156,7 +156,7 @@ class Server_connection(threading.Thread):
                 i.csocket.close()
         self.server.close()
 
-class ClientThread(threading.Thread):
+class Client_Thread(threading.Thread):
     def __init__(self, client_adress, clientsocket, server_header: list[dict], server_format: list[dict], client_header: list[dict], client_format: list[dict], update:Type[normal_update]):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
