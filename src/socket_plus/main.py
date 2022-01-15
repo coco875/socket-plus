@@ -165,12 +165,10 @@ class ClientThread(threading.Thread):
         self.c_header = client_header
         self.c_format = client_format
         self.update = update
-        print("New connection added: ", client_adress)
         self.client_adress = client_adress
         self.list_bit = []
 
     def run(self):
-        print("Connection from : ", self.client_adress)
         self.update(self)
 
     def add_to_send(self, thing:dict) -> None:
