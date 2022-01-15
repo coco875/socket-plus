@@ -29,15 +29,14 @@ def update(self):
     msg = "c'est un test"
     self.add_to_send({"id_type": 0, "len_msg": len(msg), "msg": msg})
     msg = "bon ça marche iqimjdijqmoiejrfm"
-    print(bytes(msg,'utf-8'), len(bytes(msg,'utf-8')))
     self.add_to_send({"id_type": 0, "len_msg": 100, "msg": msg})
     self.send()
     print(self.recv())
     
 s = socket_plus.Server_connection("localhost", 6000, headers_socket, format_socket, update=update)
 s.start()
-c = socket_plus.Client_connection(
-    "localhost", 6000,  headers_socket, format_socket)
+c = socket_plus.Client_connection("localhost", 6000,  headers_socket, format_socket)
+
 try:
     c.connect()
 except TimeoutError:
