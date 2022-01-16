@@ -95,7 +95,7 @@ class Server_tchat(threading.Thread):
         while continues:
             if tchat != self.tchat:
                 for i in range(len(self.tchat),tchat):
-                    if tchat[i]{"id"}!=self.id:
+                    if tchat[i]["id"]!=self.id:
                         self.client.add_to_send({})
 
 all_client = []
