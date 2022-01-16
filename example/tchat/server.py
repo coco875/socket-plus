@@ -1,5 +1,6 @@
 import threading
 import socket_plus
+from socket_plus.main import Client_Thread
 
 client_header = [
     {
@@ -86,7 +87,7 @@ continues = True
 tchat = []
 
 class Server_tchat(threading.Thread):
-    def __init__(self, id, client):
+    def __init__(self, id, client: socket_plus.Client_Thread):
         threading.Thread.__init__(self)
         self.client = client
         self.id = id
@@ -96,23 +97,18 @@ class Server_tchat(threading.Thread):
             if tchat != self.tchat:
                 for i in range(len(self.tchat),tchat):
                     if tchat[i]["id"]!=self.id:
-                        self.client.add_to_send({})
+                        self.client.add_to_send({"id":1,"id_client":tchat[i]["id"]})
 
-all_client = []
+all_client = {}
 
 all_thread:list[threading.Thread] = []
 
 def update(self):
-    gene_th = True
     data = self.recv()
-    for n in range(len(all_thread)):
-        gene_th = True
-        i = all_thread[n]
-        if not i.is_alive():
-            i = Server_tchat(n)
-            gene_th = False
-            break
-    if gene_th:
-        all_thread.append(Server_tchat(len(all_thread)))
+    id = len(all_thread)
+    client_thread = Server_tchat(id)
+    all_client[id] = data["psd"]
+    client_thread.start()
+    all_thread.append(client_thread)
 
 server = socket_plus.Server_connection('localhost', 6000, server_header, server_format, client_header, client_format)
