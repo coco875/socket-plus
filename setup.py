@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="socket-plus",
-    version="0.0.1",
+    version="0.0.2",
     author="coco875",
     author_email="pereira.jannin@gmail.com",
     description="A librairie in python to comunicate more efficiently possible with structures.",
