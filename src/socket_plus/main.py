@@ -1,9 +1,16 @@
 import socket
 import threading
+import struct
 from typing import Type
 
 def normal_update(self):
     pass
+
+def float_to_bin(num):
+    return bin(struct.unpack('!I', struct.pack('!f', num))[0])[2:].zfill(32)
+
+def bin_to_float(binary):
+    return struct.unpack('!f', struct.pack('!I', int(binary, 2)))[0]
 
 def divided_list(liste:list, num:int) -> list[list]:
     list_div = []
@@ -47,7 +54,15 @@ def convert_bytes(data:dict, bins:list, struct:dict) -> tuple[dict,list]:
             num += tmp_num*i
             tmp_num *= 2
         return {struct["name"]:num}, bins[lenght:]
-    if struct["type"]==str:
+    elif struct["type"]==float:
+        traited_bin.reverse()
+        chn = ""
+        for i in traited_bin:
+            chn+=str(i)
+        chn = chn.zfill(32)
+        flt = bin_to_float(chn)
+        return {struct["name"]:flt}, bins[lenght:]
+    elif struct["type"]==str:
         lenght *= 8
         traited_bin = bins[:lenght]
         tmp_num = 1
@@ -217,7 +232,7 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
             rep.append(int(i))
         rep.reverse()
         return rep
-    if types == str:
+    elif types == str:
         ans = bytes(ans, 'utf-8')
         ans += b" "*(lenght-len(ans))
         str_bin = ""
@@ -225,10 +240,13 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
             h = bin(i)[2:]
             h = "0"*(8-len(h))+h
             str_bin = str_bin+h
-        # ans = int.from_bytes(ans, "big")
-        # ans = bin(ans)[2:]
-        # t += "0"*(((lenght)*8)-len(ans))
-        # ans = t+ans
+        rep = []
+        for i in str_bin:
+            rep.append(int(i))
+        rep.reverse()
+        return rep
+    elif types == float:
+        str_bin = float_to_bin(ans)[-lenght:]
         rep = []
         for i in str_bin:
             rep.append(int(i))
