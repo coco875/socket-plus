@@ -1,6 +1,5 @@
 import threading
 import socket_plus
-from socket_plus.main import Client_Thread
 
 client_header = [
     {
