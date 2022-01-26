@@ -6,10 +6,10 @@ from typing import Type
 def normal_update(self):
     pass
 
-def float_to_bin(num):
+def float_to_bin(num:float)->str:
     return bin(struct.unpack('!I', struct.pack('!f', num))[0])[2:].zfill(32)
 
-def bin_to_float(binary):
+def bin_to_float(binary:str)-> float:
     return struct.unpack('!f', struct.pack('!I', int(binary, 2)))[0]
 
 def divided_list(liste:list, num:int) -> list[list]:
@@ -59,7 +59,7 @@ def convert_bytes(data:dict, bins:list, struct:dict) -> tuple[dict,list]:
         chn = ""
         for i in traited_bin:
             chn+=str(i)
-        chn = chn.zfill(32)
+        chn = chn.ljust(32, "0")
         flt = bin_to_float(chn)
         return {struct["name"]:flt}, bins[lenght:]
     elif struct["type"]==str:
@@ -246,7 +246,7 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
         rep.reverse()
         return rep
     elif types == float:
-        str_bin = float_to_bin(ans)[-lenght:]
+        str_bin = float_to_bin(ans)[:lenght]
         rep = []
         for i in str_bin:
             rep.append(int(i))

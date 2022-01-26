@@ -27,9 +27,9 @@ format_socket = {
 
 def update(self):
     msg = "test message"
-    self.add_to_send({"id_type": 0, "len_msg": 32, "fl": 0.6})
+    self.add_to_send({"id_type": 0, "len_msg": len(msg), "fl": 0.6})
     msg = "c'est un test"
-    self.add_to_send({"id_type": 0, "len_msg": 32, "fl": 0.9})
+    self.add_to_send({"id_type": 0, "len_msg": len(msg), "fl": 0.9})
     msg = "bon ça marche iqimjdijqmoiejrfm"
     self.add_to_send({"id_type": 0, "len_msg": 100, "fl": 30})
     self.send()
@@ -58,7 +58,7 @@ except Exception as err:
     input()
     print(traceback.format_exc())
 else:
-    c.add_to_send({"id_type": 0, "len_msg": 32, "fl": "4.05"})
+    c.add_to_send({"id_type": 0, "len_msg": 8, "fl": "4.05"})
     c.send()
     c.disconnect()
     s.stop()
