@@ -3,16 +3,20 @@ import threading
 import struct
 from typing import Type
 
+
 def normal_update(self):
     pass
 
-def float_to_bin(num:float)->str:
-    return bin(struct.unpack('!I', struct.pack('!f', num))[0])[2:].zfill(32)
 
-def bin_to_float(binary:str)-> float:
-    return struct.unpack('!f', struct.pack('!I', int(binary, 2)))[0]
+def float_to_bin(num: float) -> str:
+    return bin(struct.unpack("!I", struct.pack("!f", num))[0])[2:].zfill(32)
 
-def divided_list(liste:list, num:int) -> list[list]:
+
+def bin_to_float(binary: str) -> float:
+    return struct.unpack("!f", struct.pack("!I", int(binary, 2)))[0]
+
+
+def divided_list(liste: list, num: int) -> list[list]:
     list_div = []
     tmp = []
     for i in liste:
@@ -24,63 +28,75 @@ def divided_list(liste:list, num:int) -> list[list]:
         list_div.append(tmp)
     return list_div
 
-def convert_bit_byte(bit:list) -> bytes:
+
+def convert_bit_byte(bit: list) -> bytes:
     num = 0
     pow_2 = 1
     for i in bit:
-        num += pow_2*i
+        num += pow_2 * i
         pow_2 *= 2
     return int(num).to_bytes(1, "big")
 
-def convert_bit(byt:bytes) -> list[int]:
+
+def convert_bit(byt: bytes) -> list[int]:
     bit = []
     for i in byt:
         num_bit = bin(i)[2:]
-        num_bit = "0"*(8-len(num_bit)) + num_bit
+        num_bit = "0" * (8 - len(num_bit)) + num_bit
         num_bit = num_bit[::-1]
         for j in num_bit:
             bit.append(int(j))
     return bit
 
-def convert_bytes(data:dict, bins:list, struct:dict) -> tuple[dict,list]:
+
+def convert_bytes(data: dict, bins: list, struct: dict) -> tuple[dict, list]:
     lenght = struct["len"]
     if type(lenght) is str:
         lenght = data[lenght]
     traited_bin = bins[:lenght]
-    if struct["type"]==int:
+    if struct["type"] == int:
         tmp_num = 1
         num = 0
         for i in traited_bin:
-            num += tmp_num*i
+            num += tmp_num * i
             tmp_num *= 2
-        return {struct["name"]:num}, bins[lenght:]
-    elif struct["type"]==float:
+        return {struct["name"]: num}, bins[lenght:]
+    elif struct["type"] == float:
         traited_bin.reverse()
         chn = ""
         for i in traited_bin:
-            chn+=str(i)
+            chn += str(i)
         chn = chn.ljust(32, "0")
         flt = bin_to_float(chn)
-        return {struct["name"]:flt}, bins[lenght:]
-    elif struct["type"]==str:
+        return {struct["name"]: flt}, bins[lenght:]
+    elif struct["type"] == str:
         lenght *= 8
         traited_bin = bins[:lenght]
         tmp_num = 1
         num = 0
         for i in traited_bin:
-            num += tmp_num*i
+            num += tmp_num * i
             tmp_num *= 2
-        chn = int.to_bytes(num, int(lenght/8), "big")
-        return {struct["name"]: chn.decode('utf-8')}, bins[lenght:]
+        chn = int.to_bytes(num, int(lenght / 8), "big")
+        return {struct["name"]: chn.decode("utf-8")}, bins[lenght:]
+
 
 class Client_connection:
-    def __init__(self, adresse_ip:str, port:int, client_header:list[dict], client_format:list[dict], server_header:list[dict] = list[dict], server_format:list[dict] = list[dict]):
+    def __init__(
+        self,
+        adresse_ip: str,
+        port: int,
+        client_header: list[dict],
+        client_format: list[dict],
+        server_header: list[dict] = list[dict],
+        server_format: list[dict] = list[dict],
+    ):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if server_header != list[dict]:
             self.s_header = server_header
         else:
             self.s_header = client_header
-        
+
         if server_format != list[dict]:
             self.s_format = server_format
         else:
@@ -99,7 +115,7 @@ class Client_connection:
     def connect(self):
         """connect client from server"""
         self.sock.connect((self.adresse_ip, self.port))
-    
+
     def add_to_send(self, thing: dict):
         for i in self.c_header:
             self.list_bit += convert_to_bin(thing, i)
@@ -129,14 +145,24 @@ class Client_connection:
             all_data.append(data)
         return all_data
 
+
 class Server_connection(threading.Thread):
-    def __init__(self, adresse_ip: str, port: int, server_header: list[dict], server_format: list[dict], client_header: list[dict] = list[dict], client_format: list[dict] = list[dict], update:Type[normal_update] = normal_update):
+    def __init__(
+        self,
+        adresse_ip: str,
+        port: int,
+        server_header: list[dict],
+        server_format: list[dict],
+        client_header: list[dict] = list[dict],
+        client_format: list[dict] = list[dict],
+        update: Type[normal_update] = normal_update,
+    ):
         threading.Thread.__init__(self)
         if client_header != list[dict]:
             self.c_header = client_header
         else:
             self.c_header = server_header
-        
+
         if client_format != list[dict]:
             self.c_format = client_format
         else:
@@ -151,6 +177,7 @@ class Server_connection(threading.Thread):
         self.server.bind((self.adresse_ip, port))
         self.starting = True
         self.all_thread = []
+
     def run(self):
         while self.starting:
             self.server.listen(1)
@@ -160,9 +187,18 @@ class Server_connection(threading.Thread):
                 pass
             else:
                 clientsock.setblocking(1)
-                newthread = Client_Thread(client_adress, clientsock, self.s_header, self.s_format, self.c_header, self.c_format, self.update)
+                newthread = Client_Thread(
+                    client_adress,
+                    clientsock,
+                    self.s_header,
+                    self.s_format,
+                    self.c_header,
+                    self.c_format,
+                    self.update,
+                )
                 newthread.start()
                 self.all_thread.append(newthread)
+
     def stop(self) -> None:
         """stop server"""
         self.starting = False
@@ -171,8 +207,18 @@ class Server_connection(threading.Thread):
                 i.csocket.close()
         self.server.close()
 
+
 class Client_Thread(threading.Thread):
-    def __init__(self, client_adress, clientsocket, server_header: list[dict], server_format: list[dict], client_header: list[dict], client_format: list[dict], update:Type[normal_update]):
+    def __init__(
+        self,
+        client_adress,
+        clientsocket,
+        server_header: list[dict],
+        server_format: list[dict],
+        client_header: list[dict],
+        client_format: list[dict],
+        update: Type[normal_update],
+    ):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
         self.s_header = server_header
@@ -186,20 +232,20 @@ class Client_Thread(threading.Thread):
     def run(self):
         self.update(self)
 
-    def add_to_send(self, thing:dict) -> None:
+    def add_to_send(self, thing: dict) -> None:
         for i in self.s_header:
             self.list_bit += convert_to_bin(thing, i)
             last = thing[i["name"]]
         for i in self.s_format[last]:
             self.list_bit += convert_to_bin(thing, i)
-    
+
     def send(self) -> None:
-        bit_byte = divided_list(self.list_bit,8)
+        bit_byte = divided_list(self.list_bit, 8)
         send = b""
         for i in bit_byte:
             send += convert_bit_byte(i)
         self.csocket.send(send)
-    
+
     def recv(self) -> list[dict]:
         msg = self.csocket.recv(1024)
         bin_msg = convert_bit(msg)
@@ -215,7 +261,8 @@ class Client_Thread(threading.Thread):
             all_data.append(data)
         return all_data
 
-def convert_to_bin(values:dict, struc:dict) -> list[list]:
+
+def convert_to_bin(values: dict, struc: dict) -> list[list]:
     types = struc["type"]
     lenght = struc["len"]
     value = values[struc["name"]]
@@ -225,21 +272,21 @@ def convert_to_bin(values:dict, struc:dict) -> list[list]:
     t = ""
     if types == int:
         ans = bin(ans)[2:]
-        t += "0"*(lenght-len(ans))
-        ans = t+ans
+        t += "0" * (lenght - len(ans))
+        ans = t + ans
         rep = []
         for i in ans:
             rep.append(int(i))
         rep.reverse()
         return rep
     elif types == str:
-        ans = bytes(ans, 'utf-8')
-        ans += b" "*(lenght-len(ans))
+        ans = bytes(ans, "utf-8")
+        ans += b" " * (lenght - len(ans))
         str_bin = ""
         for i in ans:
             h = bin(i)[2:]
-            h = "0"*(8-len(h))+h
-            str_bin = str_bin+h
+            h = "0" * (8 - len(h)) + h
+            str_bin = str_bin + h
         rep = []
         for i in str_bin:
             rep.append(int(i))

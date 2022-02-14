@@ -1,26 +1,12 @@
 from src import socket_plus
 import traceback
 
-headers_socket = [
-    {
-        "name": "id_type",
-        "type": int,
-        "len": 4
-    }
-]
+headers_socket = [{"name": "id_type", "type": int, "len": 4}]
 
 format_socket = {
     0: [
-        {
-            "name": "len_msg",
-            "type": int,
-            "len": 12
-        },
-        {
-            "name": "fl",
-            "type": float,
-            "len": "len_msg"
-        }
+        {"name": "len_msg", "type": int, "len": 12},
+        {"name": "fl", "type": float, "len": "len_msg"},
     ]
 }
 
@@ -37,10 +23,10 @@ def update(self):
 
 
 s = socket_plus.Server_connection(
-    "localhost", 6000, headers_socket, format_socket, update=update)
+    "localhost", 6000, headers_socket, format_socket, update=update
+)
 s.start()
-c = socket_plus.Client_connection(
-    "localhost", 6000,  headers_socket, format_socket)
+c = socket_plus.Client_connection("localhost", 6000, headers_socket, format_socket)
 
 try:
     c.connect()
@@ -50,8 +36,8 @@ input()
 try:
     print(c.recv())
 except Exception as err:
-    print(type(err))    # the exception instance
-    print(err.args)     # arguments stored in .args
+    print(type(err))  # the exception instance
+    print(err.args)  # arguments stored in .args
     print(err)
     s.stop()
     c.disconnect()
